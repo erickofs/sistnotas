@@ -10,8 +10,9 @@ class Gestnotas(QMainWindow):
         self.initUI()
     
     def calculation(self):
-        self.value = self.final_grade_input.currentText()
+        self.value = self.final_grade_input.value()
         self.result_grade = (self.first_bimester_input.value() + self.second_bimester_input.value() + self.third_bimester_input.value() + self.fourth_bimester_input.value()) / 4
+        self.result_grade = round(self.result_grade, 2)
         self.final_grade_label.setText(f"Média Final: {self.result_grade}")
         if self.result_grade <= 5:
             QMessageBox.about(self, "Resultado", f"Reprovado! Sua média final foi {self.result_grade}")
@@ -31,19 +32,27 @@ class Gestnotas(QMainWindow):
         self.fourth_bimester = self.fourth_bimester_input.value()
         self.final_grade = self.result_grade
         
-        conn = sqlite3.connect('esc_deus_ch.db')
+        conn = sqlite3.connect('esc_deus_ch.db', timeout=10)
         cursor = conn.cursor()
         cursor.execute("INSERT INTO NOTAS (ANOREF, DISCIPLINA, ID_ALUNO, NOME, NOTA_1, NOTA_2, NOTA_3, NOTA_4, MEDIA_FINAL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.year, self.subject, self.student_id, self.student_name, self.first_bimester, self.second_bimester, self.third_bimester, self.fourth_bimester, self.final_grade))
         conn.commit()
         conn.close()
         if cursor.rowcount > 0:
             QMessageBox.about(self, "Resultado", "Notas registradas com sucesso!")
+        # Se o registro for bem sucedido, limpa os campos
+            self.year_input.setCurrentIndex(0)
+            self.student_id_input.setCurrentIndex(0)
+            self.student_name_input.setCurrentIndex(0)
+            self.subject_input.setCurrentIndex(0)
+            self.first_bimester_input.setValue(0)
+            self.second_bimester_input.setValue(0)
+            self.third_bimester_input.setValue(0)
+            self.fourth_bimester_input.setValue(0)
+            self.final_grade_label.setText("Média Final: ")
+        # Se o registro não for bem sucedido, exibe mensagem de erro
         else:
-            QMessageBox.about(self, "Resultado", "Erro ao registrar notas! Tente novamente")
-    
+            QMessageBox.about(self, "Resultado", "Erro ao registrar as notas!")
 
-
-    
     def initUI(self):
         self.main_widget = QWidget()
         self.main_layout = QVBoxLayout()
@@ -146,7 +155,11 @@ class Gestnotas(QMainWindow):
         self.final_grade_label.setAlignment(Qt.AlignCenter)
         self.final_grade_label.setWordWrap(True)
         self.main_layout.addWidget(self.final_grade_label)
-        self.final_grade_input = QComboBox()
+        self.final_grade_input = QDoubleSpinBox()
+        self.final_grade_input.setRange(0, 10)
+        self.final_grade_input.setDecimals(2)
+        self.final_grade_input.setSingleStep(0.1)
+        self.final_grade_input.setReadOnly(True)
         self.main_layout.addWidget(self.final_grade_input)
         
         self.calculate_button = QPushButton("Calcular Média")
