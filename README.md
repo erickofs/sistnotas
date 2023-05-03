@@ -10,10 +10,6 @@ This project was created as part of the Inclusão Tech course at Gama Academy in
 
 The main.py file is responsible for integrating the modules and running the system. The other modules can be executed independently, but to use all of the system's features, it is necessary to execute the main.py file.
 
-## Known Issues
-
-- login_process_esc.py: The module is not yet fully functional, although it can be executed.
-
 ## How to run
 
 To run the system, you must have Python 3 (works best with 3.11+) and the PySide6 package. After cloning the repository, simply run the main.py file.
